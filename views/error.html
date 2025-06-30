@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Invalid Credentials</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #fefefe;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(to right, #ffecd2, #fcb69f);
+    }
+
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 400px;
+    }
+
+    .card img {
+      width: 100px;
+      margin-bottom: 20px;
+    }
+
+    .card h1 {
+      color: #d63031;
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      color: #555;
+      font-size: 1rem;
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      text-decoration: none;
+      background: #d63031;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+
+    .btn:hover {
+      background: #e84343;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <img src="https://cdn-icons-png.flaticon.com/512/564/564619.png" alt="Error">
+    <h1>Invalid Credentials</h1>
+    <p>The email or password you entered is incorrect. Please try again.</p>
+    <a href="/login" class="btn">Go Back to Login</a>
+  </div>
+
+</body>
+</html>

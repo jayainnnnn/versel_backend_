@@ -1,0 +1,174 @@
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fc;
+            color: #333;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 5px 15px;
+            background: linear-gradient(135deg, #ffffff20, #ffffff05);
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        .logo:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.03);
+        }
+
+        .logo img {
+            height: 48px;
+            width: auto;
+            border-radius: 8px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+            transition: transform 0.3s ease;
+        }
+
+        .logo img:hover {
+            transform: rotate(-2deg) scale(1.05);
+        }
+
+        .site-name {
+            font-size: 22px;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        nav {
+            background: linear-gradient(to right, #2b5876, #4e4376);
+            padding: 12px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 17px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            height: 2px;
+            width: 0%;
+            bottom: -4px;
+            left: 0;
+            background-color: #ffd700;
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        footer {
+            background: linear-gradient(to right, #232526, #414345);
+            color: #f1f1f1;
+            text-align: center;
+            padding: 25px 20px;
+            font-size: 15px;
+        }
+
+        footer p {
+            margin-bottom: 10px;
+        }
+
+        footer a {
+            color: #ffd700;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .home-main {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 85vh;
+      gap: 60px;
+      padding: 40px 20px;
+      flex-wrap: wrap;
+    }
+
+    .home-box {
+      width: 400px;
+      height: 300px;
+      background: linear-gradient(to bottom right, #6a11cb, #2575fc);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 22px;
+      text-decoration: none;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .home-box:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 16px 30px rgba(0, 0, 0, 0.25);
+    }
+
+
+        
+
+    @media (max-width: 768px) {
+        nav {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .nav-links {
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .nav-links a {
+            margin: 8px 12px;
+        }
+
+        .main {
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .home-main {
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .home-box {
+            width: 90%;
+            height: 160px;
+            font-size: 20px;
+        }
+
+    }
+
+
+   

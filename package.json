@@ -1,0 +1,26 @@
+{
+  "name": "fullstackapp",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.1",
+    "axios": "^1.10.0",
+    "connect-pg-simple": "^10.0.0",
+    "dotenv": "^16.6.0",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "nodemailer": "^7.0.3",
+    "nodemon": "^3.1.10",
+    "pg": "^8.16.0",
+    "twilio": "^5.7.1"
+  }
+}
