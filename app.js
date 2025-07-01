@@ -7,6 +7,7 @@ const express = require('express');
 const session = require('./models/session');
 const homeRouter = require('./routes/homeRouter.js');
 const laptopRouter = require('./routes/productRouter.js');
+const {page_limiter,add_product_limiter} = require('./models/ratelimit')
 
 const app = express();
 
@@ -22,8 +23,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-app.use(homeRouter);
-app.use("/producthome",laptopRouter);
+app.use("/",page_limiter,homeRouter);
+app.use("/producthome",add_product_limiter,laptopRouter);
 
 app.use((req, res, next) => {
   res.status(404).sendFile(path.join(rootdir,'views','404.html'))
