@@ -3,7 +3,8 @@ const { sql } = require('../models/db');
 
 exports.product = async (req, res, next) => {
   const product_id = (req.params.product_id);
-
+  console.log("details api called")
+  console.log(product_id)
   try {
     const productResult = await sql`
     SELECT * FROM products_data WHERE product_id = ${product_id} LIMIT 1
@@ -40,21 +41,28 @@ exports.product = async (req, res, next) => {
       : 0;
 
     if (req.session.user?.name) {
-      res.render('product', {
-        pageTitle: 'Product Details',
+      // res.render('product', {
+      //   pageTitle: 'Product Details',
+      //   username: req.session.user.name,
+      //   image_path: product.product_image,
+      //   name: product.product_name,
+      //   price: todayPrice,
+      //   max_price: maxPrice,
+      //   discount: discount,
+      //   priceHistory: priceHistory
+      // });
+      return res.json({
         username: req.session.user.name,
-        image_path: product.product_image,
-        name: product.product_name,
-        price: todayPrice,
+        product_image: product.product_image,
+        product_name: product.product_name,
+        product_price: todayPrice,
         max_price: maxPrice,
         discount: discount,
         priceHistory: priceHistory
       });
-    } else {
-      res.render('home', { pageTitle: 'Home', username: null });
     }
   } catch (err) {
-    console.error('Error fetching product:', err);
-    res.render('404', { pageTitle: 'Error' });
+    return console.error('Error fetching product:', err);
+    
   }
 };
