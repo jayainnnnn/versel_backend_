@@ -1,5 +1,52 @@
 exports.categoryKeywords = {
-    Mobiles: ["phone", "mobile", "iphone", "samsung", "galaxy", "pixel","audio"],
-    Laptops: ["laptop", "macbook", "notebook", "dell", "hp", "lenovo"],
-    Audio: ["earbuds", "headphones", "earphones", "speaker", "airpods", "jbl"],
-  };
+  Mobiles: [
+    "phone", "mobile", "smartphone", "android", "iphone", "samsung", "galaxy",
+    "pixel", "oneplus", "xiaomi", "realme", "oppo", "vivo", "nokia", "5g phone"
+  ],
+
+  Laptops: [
+    "laptop", "macbook", "notebook", "dell", "hp", "lenovo", "acer", "asus",
+    "msi", "chromebook", "ultrabook", "thinkpad", "gaming laptop", "windows laptop"
+  ],
+
+  Audio: [
+    "earbuds", "headphones", "earphones", "speaker", "airpods", "jbl",
+    "boat", "sony headphones", "soundbar", "wireless audio", "bluetooth speaker"
+  ],
+
+  Books: [
+    "laptop",
+    "book", "novel", "story", "biography", "autobiography", "textbook",
+    "comics", "fiction", "non-fiction", "manga", "paperback", "hardcover"
+  ],
+
+  Home: [
+    "laptop",
+    "furniture", "sofa", "bed", "mattress", "wardrobe", "table", "chair",
+    "curtains", "lighting", "fan", "home decor", "wall art", "mirror"
+  ],
+
+  Kitchen: [
+    "laptop",
+    "cookware", "utensils", "mixer", "grinder", "blender", "toaster",
+    "microwave", "gas stove", "kitchen set", "cutlery", "knife set", "pressure cooker"
+  ],
+
+  Clothing: [
+    "laptop",
+    "tshirt", "shirt", "jeans", "jacket", "trousers", "kurta", "saree",
+    "sweater", "hoodie", "dress", "leggings", "shorts", "blazer"
+  ],
+
+  Footwear: [
+    "laptop",
+    "shoes", "sneakers", "boots", "sandals", "flip flops", "heels",
+    "loafers", "slippers", "formal shoes", "running shoes", "sports shoes"
+  ],
+
+  Camera: [
+    "laptop",
+    "camera", "dslr", "mirrorless", "nikon", "canon", "sony", "lens",
+    "gopro", "tripod", "camcorder", "camera kit", "photography", "webcam"
+  ]
+};

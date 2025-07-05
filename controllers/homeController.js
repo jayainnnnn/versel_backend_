@@ -61,9 +61,9 @@ exports.postlogin = async(req,res,next) => {
     }
 }
 
-exports.getsignup = (req,res,next) => {
-    res.sendFile(path.join(rootdir,'views','signup.html'));
-}
+// exports.getsignup = (req,res,next) => {
+//     res.sendFile(path.join(rootdir,'views','signup.html'));
+// }
 
 exports.postsignup = async(req,res,next) => {
     const { name, email, password, phone_number} = req.body;
@@ -92,17 +92,21 @@ exports.postsignup = async(req,res,next) => {
 }
 
 exports.getlogout = (req,res,next) => {
+    console.log("logout api called")
     try{
         req.session.destroy();
+        console.log("session breaked success")
         return res.json({
             message:"successfully logout"
         })
     }
     catch(error){
-        return res.sendFile(path.join(rootdir,'views','error.html'));
+        return res.json({
+            message:"failed to logout"
+        })
     }
 }
 
-exports.get404 = (req,res,next) => {
-    res.sendFile(path.join(rootdir,'views','404.html'));
-}
+// exports.get404 = (req,res,next) => {
+//     res.sendFile(path.join(rootdir,'views','404.html'));
+// }

@@ -23,7 +23,8 @@ exports.productsRouter = async(req,res,next) => {
         FROM user_urls uu
         LEFT JOIN products_data pd
         ON uu.product_id = pd.product_id
-        WHERE uu.email = ${email}
+        WHERE uu.email = ${email} and
+        pd.date = CURRENT_DATE
         `;
         console.log(response_data[0])
         return res.json(response_data)

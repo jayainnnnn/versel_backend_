@@ -5,5 +5,4 @@ const {requireLogin} = require('../models/auth')
 const categoryController = require('../controllers/categoryController')
 
 categoryRouter.get('/:item_category',requireLogin,categoryController.product_category)
-
 module.exports = categoryRouter;

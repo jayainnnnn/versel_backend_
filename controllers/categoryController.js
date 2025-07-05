@@ -50,6 +50,7 @@ exports.product_category = async (req,res,next) => {
                 category: item_category
             });
         }
+        finalResult.sort((a, b) => Number(b.percentage_change) - Number(a.percentage_change));
         return res.json(finalResult);
     }
     catch(err){
