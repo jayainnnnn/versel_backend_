@@ -76,7 +76,8 @@ exports.postsignup = async(req,res,next) => {
 
             if (existingUser.length !== 0) {
                 // a popup of user already exist
-                return res.sendFile(path.join(rootdir,'views','signup.html'));
+                // return res.sendFile(path.join(rootdir,'views','signup.html'));
+                return res.status(500).json({ message: "Existing USER" });
             }
             const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -84,10 +85,10 @@ exports.postsignup = async(req,res,next) => {
                 INSERT INTO signup (name, email, password, phone_number)
                 VALUES (${name}, ${email}, ${hashedPassword}, ${phone_number})
             `;
-            return res.sendFile(path.join(rootdir,'views','login.html'));
+            return res.json({ message: "SUCCESS" });
         }
         catch(error){
-            return res.sendFile(path.join(rootdir,'views','signup.html'));
+            res.status(500).json({ message: "Server error" });;
         }
 }
 

@@ -64,6 +64,7 @@ exports.postadd_product = async(req,res,next) =>{
             WHERE email = ${req.session.user.email}
         `;
         const product_id = match[1]; 
+        console.log("product_id = ")
         console.log(product_id)
         // check if the product is already being tracked or not
         const product_tracking = await sql`
@@ -71,6 +72,7 @@ exports.postadd_product = async(req,res,next) =>{
         `;
         // if being tracked provide the details from here
         if (product_tracking.length !==0){
+            console.log("product already found tracked",product_tracking)
             await sql`
             INSERT INTO user_urls (email,product_url,product_id)
             VALUES (${req.session.user.email},${url},${product_id})
