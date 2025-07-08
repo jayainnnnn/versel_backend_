@@ -15,37 +15,31 @@ exports.categoryKeywords = {
   ],
 
   Books: [
-    "laptop",
     "book", "novel", "story", "biography", "autobiography", "textbook",
     "comics", "fiction", "non-fiction", "manga", "paperback", "hardcover"
   ],
 
   Home: [
-    "laptop",
     "furniture", "sofa", "bed", "mattress", "wardrobe", "table", "chair",
     "curtains", "lighting", "fan", "home decor", "wall art", "mirror"
   ],
 
   Kitchen: [
-    "laptop",
     "cookware", "utensils", "mixer", "grinder", "blender", "toaster",
     "microwave", "gas stove", "kitchen set", "cutlery", "knife set", "pressure cooker"
   ],
 
   Clothing: [
-    "laptop",
     "tshirt", "shirt", "jeans", "jacket", "trousers", "kurta", "saree",
     "sweater", "hoodie", "dress", "leggings", "shorts", "blazer"
   ],
 
   Footwear: [
-    "laptop",
     "shoes", "sneakers", "boots", "sandals", "flip flops", "heels",
     "loafers", "slippers", "formal shoes", "running shoes", "sports shoes"
   ],
 
   Camera: [
-    "laptop",
     "camera", "dslr", "mirrorless", "nikon", "canon", "sony", "lens",
     "gopro", "tripod", "camcorder", "camera kit", "photography", "webcam"
   ]
