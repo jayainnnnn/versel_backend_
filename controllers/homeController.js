@@ -1,19 +1,6 @@
-const path = require('path');
-const rootdir = require('../utils/pathutil');
-const { sendLoginEmail } = require('../utils/email');
-// const { sendSMS } = require('../utils/sms')
 const {sql} = require("../models/db");
 const bcrypt = require('bcrypt');
-const { json } = require('stream/consumers');
 
-
-exports.homeController = (req,res,next) => {
-    res.render('home',{pageTitle:'home',username:req.session.user?.name});
-};
-
-// exports.getlogin = (req,res,next) => {
-//     res.sendFile(path.join(rootdir, 'views', 'login.html'));
-// }
 
 exports.postlogin = async(req,res,next) => {
     // collect details from login form
@@ -40,13 +27,8 @@ exports.postlogin = async(req,res,next) => {
             products_tracking: user_data[0].products_tracking,
             role: user_data[0].role
         };
-            // send login alert email and sms 
-            // await sendSMS();
-            // await sendLoginEmail(user.email, user.name);
-        // return res.render('home',{pageTitle:'Home',username:user_data[0].name});
         return res.json({
-            message: "Login successful",
-            
+            message: "Login successful", 
             user: {
                 name: user_data[0].name,
                 email: user_data[0].email,
@@ -55,15 +37,9 @@ exports.postlogin = async(req,res,next) => {
         });
     }
     catch(error){
-        // return res.sendFile(path.join(rootdir,'views','error.html'));
-        console.error("Login error:", error.message);
         return res.status(500).json({ message: "Server error" });
     }
 }
-
-// exports.getsignup = (req,res,next) => {
-//     res.sendFile(path.join(rootdir,'views','signup.html'));
-// }
 
 exports.postsignup = async(req,res,next) => {
     const { name, email, password, phone_number} = req.body;
@@ -93,10 +69,8 @@ exports.postsignup = async(req,res,next) => {
 }
 
 exports.getlogout = (req,res,next) => {
-    console.log("logout api called")
     try{
         req.session.destroy();
-        console.log("session breaked success")
         return res.json({
             message:"successfully logout"
         })
@@ -107,7 +81,3 @@ exports.getlogout = (req,res,next) => {
         })
     }
 }
-
-// exports.get404 = (req,res,next) => {
-//     res.sendFile(path.join(rootdir,'views','404.html'));
-// }

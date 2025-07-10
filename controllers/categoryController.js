@@ -15,66 +15,25 @@ exports.product_category = async (req,res,next) => {
         if (idx > 0) whereClause = sql`${whereClause} OR `;
         whereClause = sql`${whereClause} ${cond}`;
         });
-
-        // const todayProducts = await sql`
-        //     SELECT *
-        //     FROM products_data
-        //     WHERE (${whereClause}) AND date = CURRENT_DATE
-        // `;
-        // if (todayProducts.length === 0) {
-        //     return res.json([]);
-        // }
-
-        // const finalResult = [];
-        // for (const product of todayProducts) {
-        //     const maxResult = await sql`
-        //         SELECT MAX(product_price) AS max_price
-        //         FROM products_data
-        //         WHERE product_id = ${product.product_id}
-        //     `;
-
-        //     const maxPrice = (maxResult[0]?.max_price || product.product_price);
-        //     const todayPrice = (product.product_price);
-
-        //     const percentage_change = (
-        //     (((maxPrice-todayPrice ) / maxPrice) * 100).toFixed(2)
-        //     );
-
-        //     finalResult.push({
-        //         product_id: product.product_id,
-        //         product_name: product.product_name,
-        //         product_image: product.product_image,
-        //         product_price: todayPrice,
-        //         max_price: maxPrice,
-        //         percentage_change,
-        //         category: item_category
-        //     });
-        // }
-        // finalResult.sort((a, b) => Number(b.percentage_change) - Number(a.percentage_change));
         const todayProducts = await sql`
         SELECT 
             p.product_id,
             p.product_name,
             p.product_image,
-            p.product_price::numeric,
-            mp.max_price::numeric,
-            ROUND(((mp.max_price::numeric - p.product_price::numeric) / mp.max_price::numeric) * 100, 2) AS percentage_change
+            p.product_price,
+            p.product_max_price,
+            p.product_discount
         FROM products_data p
-        JOIN (
-            SELECT product_id, MAX(product_price::numeric) AS max_price
-            FROM products_data
-            GROUP BY product_id
-        ) mp ON p.product_id = mp.product_id
-        WHERE (${whereClause}) AND p.date = CURRENT_DATE
-        ORDER BY percentage_change DESC
+        WHERE (${whereClause})
+        ORDER BY p.product_discount DESC
         `;
         const finalResult = todayProducts.map(product => ({
         product_id: product.product_id,
         product_name: product.product_name,
         product_image: product.product_image,
         product_price: product.product_price,
-        max_price: product.max_price,
-        percentage_change: product.percentage_change,
+        max_price: product.product_max_price,
+        percentage_change: product.product_discount,
         category: item_category
         }));
 
@@ -106,26 +65,22 @@ exports.home_product_category = async (req,res,next) => {
                 p.product_id,
                 p.product_name,
                 p.product_image,
-                p.product_price::numeric,
-                mp.max_price::numeric,
-                ROUND(((mp.max_price::numeric - p.product_price::numeric) / mp.max_price::numeric) * 100, 2) AS percentage_change
+                p.product_price,
+                p.product_max_price,
+                p.product_discount
             FROM products_data p
-            JOIN (
-                SELECT product_id, MAX(product_price::numeric) AS max_price
-                FROM products_data
-                GROUP BY product_id
-            ) mp ON p.product_id = mp.product_id
-            WHERE (${whereClause}) AND p.date = CURRENT_DATE
-            ORDER BY percentage_change DESC
+            WHERE (${whereClause})
+            ORDER BY p.product_discount DESC
             LIMIT 10
         `;
+        // WHERE (${whereClause}) AND p.date = CURRENT_DATE
         const finalResult = todayProducts.map(product => ({
         product_id: product.product_id,
         product_name: product.product_name,
         product_image: product.product_image,
         product_price: product.product_price,
-        max_price: product.max_price,
-        percentage_change: product.percentage_change,
+        max_price: product.product_max_price,
+        percentage_change: product.product_discount,
         category: item_category
         }));
 
