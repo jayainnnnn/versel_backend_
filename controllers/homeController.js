@@ -4,21 +4,26 @@ const bcrypt = require('bcrypt');
 
 exports.postlogin = async(req,res,next) => {
     // collect details from login form
+    console.log("postlogin step1")
     const {email, password} = req.body;
     try {
+        console.log("step2")
         // check weather a email is valid or not
         const user_data = await sql`
             SELECT * FROM signup WHERE email = ${email}
         `;
+        console.log("step3")
         if (user_data.length === 0){
             // if not registered then show a popup of invalid email
             return res.status(401).json({ message: "Invalid email" });
         }
         const isMatch = await bcrypt.compare(password, user_data[0].password);
+        console.log("step4")
         if (!isMatch){
             // if password does not match then show popup of incorrect password
             return res.status(401).json({ message: "Incorrect password" });
         }
+        console.log("step5")
         req.session.isLoggedin = true;
         req.session.user = {
             // insert details of user in session
@@ -27,6 +32,7 @@ exports.postlogin = async(req,res,next) => {
             products_tracking: user_data[0].products_tracking,
             role: user_data[0].role
         };
+        console.log("step6")
         return res.json({
             message: "Login successful", 
             user: {
