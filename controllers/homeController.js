@@ -1,5 +1,6 @@
 const {sql} = require("../models/db");
 const bcrypt = require('bcrypt');
+const { getIO } = require("../sockets/socket");
 
 
 exports.postlogin = async(req,res,next) => {
@@ -33,6 +34,9 @@ exports.postlogin = async(req,res,next) => {
             role: user_data[0].role
         };
         console.log("step6")
+
+
+
         return res.json({
             message: "Login successful", 
             user: {
@@ -67,6 +71,18 @@ exports.postsignup = async(req,res,next) => {
                 INSERT INTO signup (name, email, password, phone_number)
                 VALUES (${name}, ${email}, ${hashedPassword}, ${phone_number})
             `;
+
+            result = await sql`
+                select 
+                    COUNT(email) as total_users,
+                    COUNT(CASE WHEN role = 'premium' THEN 1 END) AS premium_users
+                from signup
+            `;
+
+
+            const io = getIO()
+            io.emit("userCounts", result[0])
+
             return res.json({ message: "SUCCESS" });
         }
         catch(error){

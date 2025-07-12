@@ -1,32 +1,41 @@
 const { sql } = require('../models/db');
 
-exports.usersdetails = async(req,res,next) => {
+exports.admindashboard = async(req,res,next) => {
     try{
         const userdetails = await sql`
             SELECT 
                 COUNT(email) AS total_users,
-                COUNT(CASE WHEN role = 'premium' THEN 1 END) AS premium_users
+                COUNT(CASE WHEN role = 'premium' THEN 1 END) AS premium_users,
+                SUM(active_alerts) AS active_alerts
             FROM signup
         `;
-        return res.json(userdetails)
+        const productdetails = await sql`
+            select 
+                COUNT(CASE WHEN product_discount>0 THEN 1 END) AS positive_discount,
+                COUNT(CASE WHEN product_discount<0 THEN 1 END) as negetive_Discount,
+                COUNT(product_name) as total_products
+            from products_data
+        `;
+        return res.json({
+            userdetails: userdetails[0],
+            productdetails: productdetails[0]})
     }
-
     catch(error){
         return res.error(error)
     }
 };
-exports.productdetails = async(req,res,next) => {
+
+exports.allusersdetails = async(req,res,next) => {
     try{
-        const productdetails = await sql`
-            select 
-                COUNT(CASE WHEN product_discount>0 THEN 1 END) AS positive_discount,
-                COUNT(CASE WHEN product_discount<0 THEN 1 END) as negetive_Discount
-            from products_data
+        const userdetails = await sql`
+            select * from signup
         `;
-        return res.json(productdetails)
+        return res.json({
+            userdetails: userdetails
+        })
     }
     catch(error){
-        return res.error(error)
+        res.error(error)
     }
-    
+
 }

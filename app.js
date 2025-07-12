@@ -10,14 +10,19 @@ const homeRouter = require('./routes/homeRouter.js');
 const laptopRouter = require('./routes/productRouter.js');
 const categoryRouter = require('./routes/categoryRouter.js')
 const adminRouter = require('./routes/adminRouter.js')
-const {page_limiter,add_product_limiter} = require('./models/ratelimit')
-
+const {page_limiter,add_product_limiter} = require('./models/ratelimit.js')
+const {requireLogin,requireAdmin} = require('./models/auth.js')
+const http = require("http");
 const app = express();
 
 app.use(cors({
   origin: "http://localhost:5173",
   credentials: true,
 }));
+const { setupSocket } = require('./sockets/socket.js');
+const server = http.createServer(app);
+setupSocket(server);
+
 
 const sessionMiddleware = session.sessionMiddleware
 app.use(sessionMiddleware)
@@ -32,17 +37,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.use("/",page_limiter,homeRouter);
-app.use("/category",page_limiter,categoryRouter);
-app.use("/producthome",add_product_limiter,laptopRouter);
-app.use("/admin",adminRouter)
+app.use("/category",requireLogin,page_limiter,categoryRouter);
+app.use("/producthome",requireLogin,add_product_limiter,laptopRouter);
+app.use("/admin",requireAdmin,page_limiter,adminRouter)
 
-app.use((req, res, next) => {
-  res.status(404).sendFile(path.join(rootdir,'views','404.html'))
-});
+
 
 
 
 const PORT = 3008;
-app.listen(PORT, () => {
+
+server.listen(PORT, () => {
     console.log(`Server Running at http://localhost:${PORT}`);
 });
