@@ -38,6 +38,6 @@ exports.product = async (req, res, next) => {
       });
     }
   catch (err) {
-    return console.error('Error fetching product:', err);
+    return res.status(500).json({ message: "Server error" });
     }
 };

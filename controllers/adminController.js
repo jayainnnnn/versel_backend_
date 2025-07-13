@@ -21,7 +21,7 @@ exports.admindashboard = async(req,res,next) => {
             productdetails: productdetails[0]})
     }
     catch(error){
-        return res.error(error)
+        return res.status(500).json({ message: "Server error" });
     }
 };
 
@@ -35,7 +35,7 @@ exports.allusersdetails = async(req,res,next) => {
         })
     }
     catch(error){
-        res.error(error)
+        return res.status(500).json({ message: "Server error" });
     }
 
 }

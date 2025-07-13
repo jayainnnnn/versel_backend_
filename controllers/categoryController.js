@@ -27,6 +27,7 @@ exports.product_category = async (req,res,next) => {
         WHERE (${whereClause})
         ORDER BY p.product_discount DESC
         `;
+        
         const finalResult = todayProducts.map(product => ({
         product_id: product.product_id,
         product_name: product.product_name,
@@ -41,7 +42,7 @@ exports.product_category = async (req,res,next) => {
     }
     catch(err){
         console.error("Error fetching products by category:", err);
-        res.status(500).json({ message: "Server error" });
+        return res.status(500).json({ message: "Server error" });
     }
 }
 exports.home_product_category = async (req,res,next) => {
@@ -88,7 +89,7 @@ exports.home_product_category = async (req,res,next) => {
     }
     catch(err){
         console.error("Error fetching products by category:", err);
-        res.status(500).json({ message: "Server error" });
+        return res.status(500).json({ message: "Server error" });
     }
 }
 

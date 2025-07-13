@@ -1,13 +1,13 @@
 // core modules
-const path = require('path');
-const rootdir = require('./utils/pathutil');
+// const path = require('path');
+// const rootdir = require('./utils/pathutil');
 const cors = require("cors");
 // external depandencies
 const express = require('express');
 
 const session = require('./models/session');
 const homeRouter = require('./routes/homeRouter.js');
-const laptopRouter = require('./routes/productRouter.js');
+const productRouter = require('./routes/productRouter.js');
 const categoryRouter = require('./routes/categoryRouter.js')
 const adminRouter = require('./routes/adminRouter.js')
 const {page_limiter,add_product_limiter} = require('./models/ratelimit.js')
@@ -27,18 +27,18 @@ setupSocket(server);
 const sessionMiddleware = session.sessionMiddleware
 app.use(sessionMiddleware)
 
-app.set('view engine', 'ejs');
-app.set('views', 'views');
+// app.set('view engine', 'ejs');
+// app.set('views', 'views');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.use("/",page_limiter,homeRouter);
 app.use("/category",requireLogin,page_limiter,categoryRouter);
-app.use("/producthome",requireLogin,add_product_limiter,laptopRouter);
+app.use("/producthome",requireLogin,add_product_limiter,productRouter);
 app.use("/admin",requireAdmin,page_limiter,adminRouter)
 
 

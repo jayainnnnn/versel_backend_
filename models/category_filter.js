@@ -1,5 +1,6 @@
 exports.categoryKeywords = {
   Mobiles: [
+    "camera",
     "phone", "mobile", "smartphone", "android", "iphone", "samsung", "galaxy",
     "pixel", "oneplus", "xiaomi", "realme", "oppo", "vivo", "nokia", "5g phone"
   ],

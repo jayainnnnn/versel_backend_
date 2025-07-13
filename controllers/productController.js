@@ -3,6 +3,7 @@ const axios = require('axios');
 const reference = require("../ref/path");
 const api_path = reference.api_path
 const {sql} = require("../models/db");
+const { param } = require('../routes/productRouter');
 
 exports.productsRouter = async(req,res,next) => {
     console.log("api producthome called")
@@ -75,7 +76,26 @@ exports.postadd_product = async(req,res,next) =>{
         }
     catch(error){
         // if any error is raised
-        return res.json({message:'error occured'})
+        return res.status(500).json({ message: "Server error" });
     }
 };
+
+exports.search = async(req,res,next) => {
+    const {productName} = (req.params.productName);
+    try{
+        const response = await axios.post(`${api_path}/searchproduct`,{
+                productName,
+                email: req.session.user.email
+            },{
+                headers: { "Content-Type": "application/json" }
+            });
+        if (response.length===0){
+            return res.json({message:"NO PRODUCTS FOUND"})
+        }
+        return res.json({response})
+    }
+    catch(error){
+        return res.error(error)
+    }
+}
 
