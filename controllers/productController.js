@@ -3,7 +3,6 @@ const axios = require('axios');
 const reference = require("../ref/path");
 const api_path = reference.api_path
 const {sql} = require("../models/db");
-const { param } = require('../routes/productRouter');
 
 exports.productsRouter = async(req,res,next) => {
     console.log("api producthome called")
@@ -28,7 +27,7 @@ exports.productsRouter = async(req,res,next) => {
         return res.json(response_data)
         }
         catch(error){
-            return res.json({message: 'Error'})
+            return res.status(500).json({message:error.message || "Internal Server Error"});
         }
 };
 
@@ -54,29 +53,43 @@ exports.postadd_product = async(req,res,next) =>{
         `;
         const product_id = match[1]; 
         // check if the product is already being tracked or not
-        const product_tracking = await sql`
-            SELECT * FROM products_data where product_id = ${product_id}
+        const check_already_searching_by_user = await sql`
+            SELECT * 
+            FROM user_urls
+            WHERE email=${req.session.user.email} && product_id=${product_id}
         `;
-        // if being tracked provide the details from here
-        if (product_tracking.length !==0){
-            await sql`
-            INSERT INTO user_urls (email,product_url,product_id)
-            VALUES (${req.session.user.email},${url},${product_id})
+        if(check_already_searching_by_user.length>0){
+            return res.json({message:"PRODUCT ALREADY SEARCHING"})
+        }
+        const check_already_searching_by_us = await sql`
+            SELECT * 
+            FROM products_data
+            WHERE product_id=${product_id}
             `;
-            return res.json({ message: 'Already tracking this product' });
-        } 
+        await sql`
+                INSERT INTO user_urls(email,product_id)
+                VALUES (${req.session.user.email},${product_id})  
+            `;
+        if(check_already_searching_by_us.length>0){
+            return res.json({message:"PRODUCT ADDED SUCCESSFULLY"})
+        }
+        await sql`
+            INSERT INTO product_ids(product_id)
+            VALUES (${product_id})
+            `; 
         // else start a seprate tracking for him
+        const product_url = `https://www.amazon.in/dp/${product_id}`;
         const response = await axios.post(`${api_path}/addproduct`,{
-                url,
-                email: req.session.user.email
+                product_id: product_id,
+                product_url: product_url
             },{
                 headers: { "Content-Type": "application/json" }
             });
-            return res.json({message:'successful'})
-        }
+        return res.json({ status: "success", message: "PRODUCT ADDED SUCCESSFULLY" });
+    }
     catch(error){
         // if any error is raised
-        return res.status(500).json({ message: "Server error" });
+        return res.status(500).json({message:error.message || "Internal Server Error"});
     }
 };
 
@@ -97,5 +110,53 @@ exports.search = async(req,res,next) => {
     catch(error){
         return res.status(500).json({ message: error.message || "Internal Server Error" });
     }
+}
+
+exports.add_searched_product = async(req,res,next) => {
+    try{
+        const {product_id} = req.params;
+        const check_already_searching_by_user = await sql`
+            SELECT * 
+            FROM user_urls
+            WHERE email=${req.session.user.email} AND product_id=${product_id}
+        `;
+        if(check_already_searching_by_user.length>0){
+            return res.json({message:"PRODUCT ALREADY SEARCHING"})
+        }
+        const check_already_searching_by_us = await sql`
+            SELECT * 
+            FROM products_data
+            WHERE product_id=${product_id}
+            `;
+        await sql`
+                INSERT INTO user_urls(email,product_id)
+                VALUES (${req.session.user.email},${product_id}) 
+                ON CONFLICT DO NOTHING 
+            `;
+        if(check_already_searching_by_us.length>0){
+            return res.json({message:"PRODUCT ADDED SUCCESSFULLY"})
+        }
+        await sql`
+            INSERT INTO product_ids(product_id)
+            VALUES (${product_id})
+            ON CONFLICT DO NOTHING
+            `;
+        const product_url = `https://www.amazon.in/dp/${product_id}`;
+        const response = await axios.post(`${api_path}/addproduct`,{
+                product_id: product_id,
+                product_url: product_url
+            },{
+                headers: { "Content-Type": "application/json" }
+            });
+        return res.json({ status: "success", message: "PRODUCT ADDED SUCCESSFULLY" });
+
+
+
+    }
+    catch(error){
+        return res.status(500).json({message:error.message || "Internal Server Error"})
+    }
+    
+
 }
 
