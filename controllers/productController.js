@@ -81,21 +81,21 @@ exports.postadd_product = async(req,res,next) =>{
 };
 
 exports.search = async(req,res,next) => {
-    const {productName} = (req.params.productName);
+    const {productName} = req.params;
     try{
         const response = await axios.post(`${api_path}/searchproduct`,{
-                productName,
+                name: productName,
                 email: req.session.user.email
             },{
                 headers: { "Content-Type": "application/json" }
             });
-        if (response.length===0){
-            return res.json({message:"NO PRODUCTS FOUND"})
+        if (!response.data || response.data.length === 0) {
+            return res.json({ message: "NO PRODUCTS FOUND" });
         }
-        return res.json({response})
+        return res.json(response.data)
     }
     catch(error){
-        return res.error(error)
+        return res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 }
 
