@@ -35,32 +35,36 @@ exports.postadd_product = async(req,res,next) =>{
     const {url} = req.body;
     try{
         // check wheather he can add the product or not
-        if (req.session.user.role==='free_user' && req.session.user.product_tracking>100){
-            return res.json({message:'limit exceed for free user'});
-        }
+        // if (req.session.user.role==='free_user' && req.session.user.product_tracking>100){
+        //     return res.json({message:'limit exceed for free user'});
+        // }
         // capture product_id from url
         const match = url.match(/\/dp\/([A-Z0-9]{10})/);
         if (!match) {
             console.log("Invalid URL: No product_id found");
             return res.json({message:'invalid url'});
         }
+        console.log("valid url")
         // increase the count of tracking products by 1
-        req.session.user.products_tracking = req.session.user.products_tracking+1
-        await sql`
-            UPDATE signup 
-            SET products_tracking = ${req.session.user.products_tracking}
-            WHERE email = ${req.session.user.email}
-        `;
+        // req.session.user.products_tracking = req.session.user.products_tracking+1
+        // await sql`
+        //     UPDATE signup 
+        //     SET products_tracking = ${req.session.user.products_tracking}
+        //     WHERE email = ${req.session.user.email}
+        // `;
         const product_id = match[1]; 
+        // console.log(product_id)
         // check if the product is already being tracked or not
         const check_already_searching_by_user = await sql`
             SELECT * 
             FROM user_urls
-            WHERE email=${req.session.user.email} && product_id=${product_id}
+            WHERE email=${req.session.user.email} AND product_id=${product_id}
         `;
+        // console.log(check_already_searching_by_user)
         if(check_already_searching_by_user.length>0){
             return res.json({message:"PRODUCT ALREADY SEARCHING"})
         }
+        // console.log("not found tracking by you")
         const check_already_searching_by_us = await sql`
             SELECT * 
             FROM products_data
@@ -70,6 +74,8 @@ exports.postadd_product = async(req,res,next) =>{
                 INSERT INTO user_urls(email,product_id)
                 VALUES (${req.session.user.email},${product_id})  
             `;
+        // console.log("insert in user_urls")
+        // console.log(check_already_searching_by_us)
         if(check_already_searching_by_us.length>0){
             return res.json({message:"PRODUCT ADDED SUCCESSFULLY"})
         }
@@ -77,6 +83,7 @@ exports.postadd_product = async(req,res,next) =>{
             INSERT INTO product_ids(product_id)
             VALUES (${product_id})
             `; 
+        // console.log("product send for api call")
         // else start a seprate tracking for him
         const product_url = `https://www.amazon.in/dp/${product_id}`;
         const response = await axios.post(`${api_path}/addproduct`,{
@@ -85,6 +92,7 @@ exports.postadd_product = async(req,res,next) =>{
             },{
                 headers: { "Content-Type": "application/json" }
             });
+        // console.log("api received")
         return res.json({ status: "success", message: "PRODUCT ADDED SUCCESSFULLY" });
     }
     catch(error){
