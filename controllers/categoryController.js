@@ -57,7 +57,7 @@ exports.product_category = async (req,res,next) => {
     const totalPages = Math.ceil(total / limit);
 
         
-        const finalResult = todayProducts.map(product => ({
+        const finalResult = products.map(product => ({
             product_id: product.product_id,
             product_name: product.product_name,
             product_image: product.product_image,
@@ -67,11 +67,11 @@ exports.product_category = async (req,res,next) => {
             category: item_category
         }));
         return res.json({
-      currentPage: page,
-      totalPages,
-      totalItems: total,
-      pageSize: limit,
-      data: finalResult
+            currentPage: page,
+            totalPages,
+            totalItems: total,
+            pageSize: limit,
+            data: finalResult
     });
 
         // return res.json(finalResult);
