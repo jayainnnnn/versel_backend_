@@ -1,6 +1,6 @@
 const { sql } = require('../models/db');
 
-exports.admindashboard = async(req,res,next) => {
+exports.admin_dashboard = async(req,res,next) => {
     try{
         const userdetails = await sql`
             SELECT 
@@ -18,21 +18,21 @@ exports.admindashboard = async(req,res,next) => {
         `;
         return res.json({
             userdetails: userdetails[0],
-            productdetails: productdetails[0]})
+            productdetails: productdetails[0]});
     }
     catch(error){
         return res.status(500).json({ message: "Server error" });
-    }
+    };
 };
 
-exports.allusersdetails = async(req,res,next) => {
+exports.admin_all_users_details = async(req,res,next) => {
     try{
         const userdetails = await sql`
             select * from signup
         `;
         return res.json({
             userdetails: userdetails
-        })
+        });
     }
     catch(error){
         return res.status(500).json({ message: "Server error" });
@@ -86,15 +86,16 @@ exports.admin_product_update = async (req, res, next) => {
     `;
 
     return res.json({ message: "success" });
-  } catch (error) {
+  } 
+  catch (error) {
     console.error("Admin product update error:", error);
     return res.status(500).json({ message: "Server error" });
-  }
+  };
 };
 
 exports.admin_product_delete = async(req,res,next) =>{
     try{
-        const {product_id} = req.params
+        const {product_id} = req.params;
         await sql`BEGIN`;
             await sql`
                 UPDATE signup
@@ -124,11 +125,34 @@ exports.admin_product_delete = async(req,res,next) =>{
             `;
         await sql`COMMIT`;
         
-        return res.json({ status: "success", message: "Product deleted successfully"});
+        return res.status(200).json({message:"SUCCESS"});
     }
     catch(error){
         await sql`ROLLBACK`;
-        return res.status(500).json({ message: "Server error" });
+        return res.status(500).json({ message:"Server error" });
+    };
+};
+
+exports.admin_user_update = async(req,res,next) =>{
+    try{
+        const {email} = req.params;
+        const {name,phone_number,product_tracking,role,active_alerts,billing,signup_date} = req.body;
+        await sql`
+            UPDATE signup
+            SET 
+                name = ${name},
+                phone_number = ${phone_number},
+                product_tracking = ${product_tracking},
+                role = ${role},
+                active_alerts = ${active_alerts},
+                billing = ${billing},
+                signup_date = ${signup_date}
+            WHERE email = ${email}
+        `;
+        return res.status(200).json({message:"SUCCESS"});
+
+    }
+    catch(error){
+        return res.status(500).json({ message:"Server error" });
     }
 }
-
