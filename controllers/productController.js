@@ -143,6 +143,13 @@ exports.search = async(req,res,next) => {
 exports.add_searched_product = async(req,res,next) => {
     try{
         const {product_id} = req.params;
+        console.log("step 1 api called with valid id")
+        // check wheather he can add the product or not
+        if (req.session.user.role==='free_user' && req.session.user.product_tracking>100){
+            return res.json({message:'limit exceed for free user'});
+        }
+        
+        console.log("step 2 allowed user")
         const check_already_searching_by_user = await sql`
             SELECT * 
             FROM user_urls
@@ -151,24 +158,30 @@ exports.add_searched_product = async(req,res,next) => {
         if(check_already_searching_by_user.length>0){
             return res.json({message:"PRODUCT ALREADY SEARCHING"})
         }
+        console.log("step 3 check_already_searching_by_user allowed")
         const check_already_searching_by_us = await sql`
             SELECT * 
             FROM products_data
             WHERE product_id=${product_id}
             `;
-        await sql`
-                INSERT INTO user_urls(email,product_id)
-                VALUES (${req.session.user.email},${product_id}) 
-                ON CONFLICT DO NOTHING 
-            `;
         if(check_already_searching_by_us.length>0){
+            const updatedCount = req.session.user.products_tracking + 1;
+            await sql`BEGIN`;
+            await sql`
+                UPDATE signup 
+                SET products_tracking = ${updatedCount}
+                WHERE email = ${email}
+            `;
+            await sql`
+                    INSERT INTO user_urls (email, product_id)
+                    VALUES (${email}, ${product_id})
+                `;
+            req.session.user.products_tracking = updatedCount;
+            await sql`COMMIT`;
             return res.json({message:"PRODUCT ADDED SUCCESSFULLY"})
         }
-        await sql`
-            INSERT INTO product_ids(product_id)
-            VALUES (${product_id})
-            ON CONFLICT DO NOTHING
-            `;
+        console.log("step 4 check_already_searching_by_us allowed")
+        // else start a seprate tracking for him
         const product_url = `https://www.amazon.in/dp/${product_id}`;
         const response = await axios.post(`${api_path}/addproduct`,{
                 product_id: product_id,
@@ -176,15 +189,36 @@ exports.add_searched_product = async(req,res,next) => {
             },{
                 headers: { "Content-Type": "application/json" }
             });
+        
+        console.log("step 5 api called success")
+        console.log(response.status)
+        if(response.status===200){
+            console.log("if called")
+            req.session.user.products_tracking = req.session.user.products_tracking+1
+            await sql`
+                UPDATE signup 
+                SET products_tracking = ${req.session.user.products_tracking}
+                WHERE email = ${req.session.user.email}
+            `;
+            await sql`
+                    INSERT INTO user_urls (email, product_id)
+                    VALUES (${email}, ${product_id})
+            `;
+            console.log("step 5.1: user_urls insert");
+
+            await sql`
+                    INSERT INTO product_ids (product_id)
+                    VALUES (${product_id})
+            `;
+            console.log("step 5.2: product_ids insert");
+            }
+            else{
+                return res.json({ status: "Failed", message: "PRODUCT FAILED TO ADD" });
+            }
         return res.json({ status: "success", message: "PRODUCT ADDED SUCCESSFULLY" });
-
-
-
     }
     catch(error){
-        return res.status(500).json({message:error.message || "Internal Server Error"})
+        // if any error is raised
+        return res.status(500).json({message:error.message || "Internal Server Error"});
     }
-    
-
-}
-
+};
