@@ -52,9 +52,23 @@ exports.admin_products_view = async(req,res,next) =>{
         `;
         return res.status(200).json({
             products: response
-        })
+        });
     }
     catch(error){
         return res.status(500).json({ message: "Server error" });
     }
 }
+
+// exports.admin_product_update = async(req,res,next) =>{
+//     try{
+//         const {product_id} = req.params;
+//         const {product_name,product_price,product_image} = req.body;
+//         await sql`
+//         UPDATE products_data
+//         set`
+
+//     }
+//     catch(error){
+//         return res.status(500).json({ message: "Server error" });
+//     }
+// }

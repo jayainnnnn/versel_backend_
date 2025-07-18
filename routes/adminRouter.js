@@ -4,6 +4,7 @@ adminRouter = express.Router();
 
 adminRouter.get('/admindashboard',adminController.admindashboard);
 adminRouter.get('/allusersdetails',adminController.allusersdetails)
-
+adminRouter.get('/admin_products_view',adminController.admin_products_view)
+// adminRouter.put('/admin_product_update:product_id',adminController.admin_product_update)
 
 module.exports = adminRouter;

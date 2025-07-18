@@ -143,6 +143,7 @@ exports.search = async(req,res,next) => {
 exports.add_searched_product = async(req,res,next) => {
     try{
         const {product_id} = req.params;
+        const email = req.session.user.email;
         console.log("step 1 api called with valid id")
         // check wheather he can add the product or not
         if (req.session.user.role==='free_user' && req.session.user.product_tracking>100){
