@@ -222,3 +222,31 @@ exports.add_searched_product = async(req,res,next) => {
         return res.status(500).json({message:error.message || "Internal Server Error"});
     }
 };
+
+exports.product_remove = async(req,res,next) => {
+    try{
+        const {product_id} = req.params
+        const email = req.session.user.email
+        const updatedCount = req.session.user.products_tracking - 1;
+        await sql`BEGIN`;
+            await sql`
+                DELETE
+                FROM user_urls
+                WHERE product_id=${product_id} AND email=${email}
+            `;
+            await sql`
+                UPDATE signup
+                SET product_tracking = ${updatedCount}
+                WHERE email=${email}
+            `;
+        await sql`COMMIT`
+        return res.json({
+            token: updatedCount,
+            status: "success"
+        })
+    }
+    catch(error){
+        return res.status(500).json({message:error.message || "Internal Server Error"});
+    }
+}
+

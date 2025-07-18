@@ -29,7 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/",page_limiter,homeRouter);
 app.use("/category",requireLogin,page_limiter,categoryRouter);
 app.use("/producthome",requireLogin,add_product_limiter,productRouter);
-app.use("/admin",requireAdmin,page_limiter,adminRouter)
+app.use("/admin",requireLogin,page_limiter,adminRouter)
 
 
 const PORT = 3008;
