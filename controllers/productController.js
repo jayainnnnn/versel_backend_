@@ -33,57 +33,49 @@ exports.productsRouter = async(req,res,next) => {
 
 exports.postadd_product = async(req,res,next) =>{
     const {url} = req.body;
-    try{
-        // check wheather he can add the product or not
-        // if (req.session.user.role==='free_user' && req.session.user.product_tracking>100){
-        //     return res.json({message:'limit exceed for free user'});
-        // }
-        // capture product_id from url
-        const match = url.match(/\/dp\/([A-Z0-9]{10})/);
+    const email = req.session.user.email
+    const match = url.match(/\/dp\/([A-Z0-9]{10})/);
         if (!match) {
             console.log("Invalid URL: No product_id found");
             return res.json({message:'invalid url'});
         }
-        console.log("valid url")
-        // increase the count of tracking products by 1
-        // req.session.user.products_tracking = req.session.user.products_tracking+1
-        // await sql`
-        //     UPDATE signup 
-        //     SET products_tracking = ${req.session.user.products_tracking}
-        //     WHERE email = ${req.session.user.email}
-        // `;
+    try{
         const product_id = match[1]; 
-        // console.log(product_id)
-        // check if the product is already being tracked or not
+        console.log("step 1 api called with valid url")
+        // check wheather he can add the product or not
+        if (req.session.user.role==='free_user' && req.session.user.product_tracking>100){
+            return res.json({message:'limit exceed for free user'});
+        }
+        
+        console.log("step 2 allowed user")
         const check_already_searching_by_user = await sql`
             SELECT * 
             FROM user_urls
             WHERE email=${req.session.user.email} AND product_id=${product_id}
         `;
-        // console.log(check_already_searching_by_user)
         if(check_already_searching_by_user.length>0){
             return res.json({message:"PRODUCT ALREADY SEARCHING"})
         }
-        // console.log("not found tracking by you")
+        console.log("step 3 check_already_searching_by_user allowed")
         const check_already_searching_by_us = await sql`
             SELECT * 
             FROM products_data
             WHERE product_id=${product_id}
             `;
-        await sql`
-                INSERT INTO user_urls(email,product_id)
-                VALUES (${req.session.user.email},${product_id})  
-            `;
-        // console.log("insert in user_urls")
-        // console.log(check_already_searching_by_us)
         if(check_already_searching_by_us.length>0){
+            req.session.user.products_tracking = req.session.user.products_tracking+1
+            await sql`
+                UPDATE signup 
+                SET products_tracking = ${req.session.user.products_tracking}
+                WHERE email = ${req.session.user.email}
+            `;
+            await sql`
+                    INSERT INTO user_urls (email, product_id)
+                    VALUES (${email}, ${product_id})
+                `;
             return res.json({message:"PRODUCT ADDED SUCCESSFULLY"})
         }
-        await sql`
-            INSERT INTO product_ids(product_id)
-            VALUES (${product_id})
-            `; 
-        // console.log("product send for api call")
+        console.log("step 4 check_already_searching_by_us allowed")
         // else start a seprate tracking for him
         const product_url = `https://www.amazon.in/dp/${product_id}`;
         const response = await axios.post(`${api_path}/addproduct`,{
@@ -92,7 +84,32 @@ exports.postadd_product = async(req,res,next) =>{
             },{
                 headers: { "Content-Type": "application/json" }
             });
-        // console.log("api received")
+        
+        console.log("step 5 api called success")
+        console.log(response.status)
+        if(response.status===200){
+            console.log("if called")
+            req.session.user.products_tracking = req.session.user.products_tracking+1
+            await sql`
+                UPDATE signup 
+                SET products_tracking = ${req.session.user.products_tracking}
+                WHERE email = ${req.session.user.email}
+            `;
+            await sql`
+                    INSERT INTO user_urls (email, product_id)
+                    VALUES (${email}, ${product_id})
+            `;
+            console.log("step 5.1: user_urls insert");
+
+            await sql`
+                    INSERT INTO product_ids (product_id)
+                    VALUES (${product_id})
+            `;
+            console.log("step 5.2: product_ids insert");
+            }
+            else{
+                return res.json({ status: "Failed", message: "PRODUCT FAILED TO ADD" });
+            }
         return res.json({ status: "success", message: "PRODUCT ADDED SUCCESSFULLY" });
     }
     catch(error){
