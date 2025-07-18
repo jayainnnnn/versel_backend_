@@ -63,16 +63,19 @@ exports.postadd_product = async(req,res,next) =>{
             WHERE product_id=${product_id}
             `;
         if(check_already_searching_by_us.length>0){
-            req.session.user.products_tracking = req.session.user.products_tracking+1
+            const updatedCount = req.session.user.products_tracking + 1;
+            await sql`BEGIN`;
             await sql`
                 UPDATE signup 
-                SET products_tracking = ${req.session.user.products_tracking}
-                WHERE email = ${req.session.user.email}
+                SET products_tracking = ${updatedCount}
+                WHERE email = ${email}
             `;
             await sql`
                     INSERT INTO user_urls (email, product_id)
                     VALUES (${email}, ${product_id})
                 `;
+            req.session.user.products_tracking = updatedCount;
+            await sql`COMMIT`;
             return res.json({message:"PRODUCT ADDED SUCCESSFULLY"})
         }
         console.log("step 4 check_already_searching_by_us allowed")
