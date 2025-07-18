@@ -224,30 +224,42 @@ exports.add_searched_product = async(req,res,next) => {
     }
 };
 
-exports.product_remove = async(req,res,next) => {
-    try{
-        const {product_id} = req.params
-        const email = req.session.user.email
+exports.product_remove = async (req, res, next) => {
+    try {
+        console.log("remove api called");
+        const { product_id } = req.params;
+        const email = req.session.user.email;
         const updatedCount = req.session.user.products_tracking - 1;
+        console.log("product_id:", product_id);
+
         await sql`BEGIN`;
-            await sql`
-                DELETE
-                FROM user_urls
-                WHERE product_id=${product_id} AND email=${email}
-            `;
-            await sql`
-                UPDATE signup
-                SET product_tracking = ${updatedCount}
-                WHERE email=${email}
-            `;
-        await sql`COMMIT`
+        console.log("start");
+
+        await sql`
+            DELETE FROM user_urls
+            WHERE product_id = ${product_id} AND email = ${email}
+        `;
+        console.log("deleted from user_urls");
+
+        await sql`
+            UPDATE signup
+            SET products_tracking = ${updatedCount}
+            WHERE email = ${email}
+        `;
+        console.log("updated signup");
+
+        await sql`COMMIT`;
+        console.log("commit");
+
         return res.json({
             token: updatedCount,
             status: "success"
-        })
+        });
+    } catch (error) {
+        console.error("ERROR in product_remove:", error); // 🔥 IMPORTANT
+        await sql`ROLLBACK`; // 🔥 REQUIRED to rollback incomplete transactions
+        return res.status(500).json({
+            message: error.message || "Internal Server Error"
+        });
     }
-    catch(error){
-        return res.status(500).json({message:error.message || "Internal Server Error"});
-    }
-}
-
+};
