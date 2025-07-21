@@ -18,19 +18,6 @@ exports.product_category = async (req,res,next) => {
         if (idx > 0) whereClause = sql`${whereClause} OR `;
         whereClause = sql`${whereClause} ${cond}`;
         });
-        // const todayProducts = await sql`
-        // SELECT 
-        //     p.product_id,
-        //     p.product_name,
-        //     p.product_image,
-        //     p.product_price,
-        //     p.product_max_price,
-        //     p.product_discount
-        // FROM products_data p
-        // WHERE (${whereClause})
-        // ORDER BY p.product_discount DESC
-        
-        // `;
         const [products, countResult] = await Promise.all([
       sql`
         SELECT 
@@ -76,9 +63,8 @@ exports.product_category = async (req,res,next) => {
 
         // return res.json(finalResult);
     }
-    catch(err){
-        console.error("Error fetching products by category:", err);
-        return res.status(500).json({ message: "Server error" });
+    catch(error){
+        return res.status(500).json({message: error.message || "Internal Server Error"});
     }
 }
 exports.home_product_category = async (req,res,next) => {
@@ -123,9 +109,8 @@ exports.home_product_category = async (req,res,next) => {
 
         return res.json(finalResult);
     }
-    catch(err){
-        console.error("Error fetching products by category:", err);
-        return res.status(500).json({ message: "Server error" });
+    catch(error){
+        return res.status(500).json({message: error.message || "Internal Server Error"});
     }
 }
 

@@ -36,7 +36,7 @@ exports.postlogin = async(req,res,next) => {
 
 
         return res.json({
-            message: "Login successful", 
+            message:"SUCCESS", 
             user: {
                 name: user_data[0].name,
                 email: user_data[0].email,
@@ -45,7 +45,7 @@ exports.postlogin = async(req,res,next) => {
         });
     }
     catch(error){
-        return res.status(500).json({ message: "Server error" });
+        return res.status(500).json({message: error.message || "Internal Server Error"});
     }
 }
 
@@ -84,20 +84,16 @@ exports.postsignup = async(req,res,next) => {
             return res.json({ message: "SUCCESS" });
         }
         catch(error){
-            return res.status(500).json({ message: "Server error" });
+            return res.status(500).json({message: error.message || "Internal Server Error"});
         }
 }
 
 exports.getlogout = (req,res,next) => {
     try{
         req.session.destroy();
-        return res.json({
-            message:"successfully logout"
-        })
+        return res.status(200).json({message:"SUCCESS"});
     }
     catch(error){
-        return res.json({
-            message:"failed to logout"
-        })
+       return res.status(500).json({message: error.message || "Internal Server Error"});
     }
 }

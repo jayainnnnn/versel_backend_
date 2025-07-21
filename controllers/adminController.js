@@ -4,7 +4,7 @@ exports.admin_dashboard = async(req,res,next) => {
     try{
         const userdetails = await sql`
             SELECT 
-                COUNT(email) AS total_users,
+                COUNT(*) AS total_users,
                 COUNT(CASE WHEN role = 'premium' THEN 1 END) AS premium_users,
                 SUM(active_alerts) AS active_alerts
             FROM signup
@@ -13,12 +13,45 @@ exports.admin_dashboard = async(req,res,next) => {
             select 
                 COUNT(CASE WHEN product_discount>0 THEN 1 END) AS positive_discount,
                 COUNT(CASE WHEN product_discount<0 THEN 1 END) as negative_Discount,
-                COUNT(product_name) as total_products
+                COUNT(*) AS total_products
             from products_data
         `;
+        const topTracked = await sql`
+            SELECT 
+                product_name,
+                product_price,
+                product_image,
+                users_tracked
+            FROM products_data
+            ORDER BY users_tracked DESC
+            LIMIT 5
+        `;
+        const today_change = await sql`
+            SELECT 
+                SUM(total_free_users+total_premium_users) as total_users,
+                total_premium_users AS total_premium_users,
+                total_alerts,
+                positive,
+                negative
+            FROM daily_change
+            WHERE date = '2025-07-21'
+        `;
+        const weekly_change = await sql`
+            SELECT
+                positive,negative
+            FROM daily_change
+            ORDER BY date DESC
+            LIMIT 7
+        `;
+
+        
         return res.status(200).json({
             userdetails: userdetails[0],
-            productdetails: productdetails[0]});
+            productdetails: productdetails[0],
+            topTracked: topTracked,
+            today_change: today_change[0],
+            weekly_change: weekly_change[0]
+        });
     }
     catch(error){
         return res.status(500).json({message: error.message || "Internal Server Error"});
@@ -148,6 +181,15 @@ exports.admin_user_update = async(req,res,next) =>{
             WHERE email = ${email}
         `;
         return res.status(200).json({message:"SUCCESS"});
+    }
+    catch(error){
+        return res.status(500).json({message: error.message || "Internal Server Error"});
+    }
+}
+
+exports.daily_change_calculation = async(req,res,next) =>{
+    try{
+        return res.status(500).json({message: error.message || "Internal Server Error"});
     }
     catch(error){
         return res.status(500).json({message: error.message || "Internal Server Error"});

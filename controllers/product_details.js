@@ -37,7 +37,7 @@ exports.product = async (req, res, next) => {
         priceHistory: historyResult
       });
     }
-  catch (err) {
-    return res.status(500).json({ message: "Server error" });
+  catch (error) {
+    return res.status(500).json({message: error.message || "Internal Server Error"});
     }
 };
