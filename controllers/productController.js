@@ -63,18 +63,18 @@ exports.postadd_product = async(req,res,next) =>{
             WHERE product_id=${product_id}
             `;
         if(check_already_searching_by_us.length>0){
-            const updatedCount = req.session.user.products_tracking + 1;
             await sql`BEGIN`;
-            await sql`
+            const products_count = await sql`
                 UPDATE signup 
-                SET products_tracking = ${updatedCount}
+                SET products_tracking = products_tracking+1
                 WHERE email = ${email}
+                RETURNING products_tracking
             `;
             await sql`
                     INSERT INTO user_urls (email, product_id)
                     VALUES (${email}, ${product_id})
                 `;
-            req.session.user.products_tracking = updatedCount;
+            req.session.user.products_tracking = products_count;
             await sql`COMMIT`;
             return res.json({message:"PRODUCT ADDED SUCCESSFULLY"})
         }
@@ -91,12 +91,11 @@ exports.postadd_product = async(req,res,next) =>{
         console.log("step 5 api called success")
         console.log(response.status)
         if(response.status===200){
-            console.log("if called")
-            req.session.user.products_tracking = req.session.user.products_tracking+1
+            await sql`BEGIN`
             await sql`
                 UPDATE signup 
-                SET products_tracking = ${req.session.user.products_tracking}
-                WHERE email = ${req.session.user.email}
+                SET products_tracking = products_tracking+1
+                WHERE email = ${email}
             `;
             await sql`
                     INSERT INTO user_urls (email, product_id)
@@ -108,6 +107,7 @@ exports.postadd_product = async(req,res,next) =>{
                     INSERT INTO product_ids (product_id)
                     VALUES (${product_id})
             `;
+            await sql`COMMIT`
             console.log("step 5.2: product_ids insert");
             }
             else{
@@ -154,7 +154,7 @@ exports.add_searched_product = async(req,res,next) => {
         const check_already_searching_by_user = await sql`
             SELECT * 
             FROM user_urls
-            WHERE email=${req.session.user.email} AND product_id=${product_id}
+            WHERE email=${email} AND product_id=${product_id}
         `;
         if(check_already_searching_by_user.length>0){
             return res.json({message:"PRODUCT ALREADY SEARCHING"})
@@ -166,18 +166,18 @@ exports.add_searched_product = async(req,res,next) => {
             WHERE product_id=${product_id}
             `;
         if(check_already_searching_by_us.length>0){
-            const updatedCount = req.session.user.products_tracking + 1;
             await sql`BEGIN`;
-            await sql`
+            const products_count = await sql`
                 UPDATE signup 
-                SET products_tracking = ${updatedCount}
+                SET products_tracking = products_tracking+1
                 WHERE email = ${email}
+                RETURNING products_tracking
             `;
             await sql`
                     INSERT INTO user_urls (email, product_id)
                     VALUES (${email}, ${product_id})
                 `;
-            req.session.user.products_tracking = updatedCount;
+            req.session.user.products_tracking = products_count;
             await sql`COMMIT`;
             return res.json({message:"PRODUCT ADDED SUCCESSFULLY"})
         }
@@ -195,15 +195,16 @@ exports.add_searched_product = async(req,res,next) => {
         console.log(response.status)
         if(response.status===200){
             console.log("if called")
-            req.session.user.products_tracking = req.session.user.products_tracking+1
-            await sql`
+            await sql`BEGIN`;
+            const products_count = await sql`
                 UPDATE signup 
-                SET products_tracking = ${req.session.user.products_tracking}
-                WHERE email = ${req.session.user.email}
+                SET products_tracking = products_tracking+1
+                WHERE email = ${email}
+                RETURNING products_tracking
             `;
             await sql`
                     INSERT INTO user_urls (email, product_id)
-                    VALUES (${email}, ${product_id})
+                    VALUES (${email}, ${product_id})    
             `;
             console.log("step 5.1: user_urls insert");
 
@@ -211,6 +212,8 @@ exports.add_searched_product = async(req,res,next) => {
                     INSERT INTO product_ids (product_id)
                     VALUES (${product_id})
             `;
+            await sql`COMMIT`;
+            console.log(products_count)
             console.log("step 5.2: product_ids insert");
             }
             else{
@@ -226,38 +229,33 @@ exports.add_searched_product = async(req,res,next) => {
 
 exports.product_remove = async (req, res, next) => {
     try {
-        console.log("remove api called");
         const { product_id } = req.params;
         const email = req.session.user.email;
-        const updatedCount = req.session.user.products_tracking - 1;
-        console.log("product_id:", product_id);
 
         await sql`BEGIN`;
-        console.log("start");
-
-        await sql`
-            DELETE FROM user_urls
-            WHERE product_id = ${product_id} AND email = ${email}
-        `;
-        console.log("deleted from user_urls");
-
-        await sql`
-            UPDATE signup
-            SET products_tracking = ${updatedCount}
-            WHERE email = ${email}
-        `;
-        console.log("updated signup");
-
+            const delete_product_id = await sql`
+                DELETE FROM user_urls
+                WHERE product_id = ${product_id} AND email = ${email}
+                RETURNING product_id
+            `;
+            if(delete_product_id.length>0){
+                const product_count = await sql`
+                    UPDATE signup
+                    SET products_tracking = products_tracking-1
+                    WHERE email = ${email}
+                    RETURNING products_tracking
+                `;
+                console.log(product_count)
+                req.session.user.products_tracking = product_count
+            }
         await sql`COMMIT`;
-        console.log("commit");
-
+        
         return res.json({
-            token: updatedCount,
             status: "success"
         });
     } catch (error) {
-        console.error("ERROR in product_remove:", error); // 🔥 IMPORTANT
-        await sql`ROLLBACK`; // 🔥 REQUIRED to rollback incomplete transactions
+        console.error("ERROR in product_remove:", error);
+        await sql`ROLLBACK`; 
         return res.status(500).json({
             message: error.message || "Internal Server Error"
         });

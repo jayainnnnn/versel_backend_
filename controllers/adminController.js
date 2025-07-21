@@ -12,16 +12,16 @@ exports.admin_dashboard = async(req,res,next) => {
         const productdetails = await sql`
             select 
                 COUNT(CASE WHEN product_discount>0 THEN 1 END) AS positive_discount,
-                COUNT(CASE WHEN product_discount<0 THEN 1 END) as negetive_Discount,
+                COUNT(CASE WHEN product_discount<0 THEN 1 END) as negative_Discount,
                 COUNT(product_name) as total_products
             from products_data
         `;
-        return res.json({
+        return res.status(200).json({
             userdetails: userdetails[0],
             productdetails: productdetails[0]});
     }
     catch(error){
-        return res.status(500).json({ message: "Server error" });
+        return res.status(500).json({message: error.message || "Internal Server Error"});
     };
 };
 
@@ -30,12 +30,10 @@ exports.admin_all_users_details = async(req,res,next) => {
         const userdetails = await sql`
             select * from signup
         `;
-        return res.json({
-            userdetails: userdetails
-        });
+        return res.status(200).json({userdetails: userdetails});
     }
     catch(error){
-        return res.status(500).json({ message: "Server error" });
+        return res.status(500).json({message: error.message || "Internal Server Error"});
     }
 }
 
@@ -55,7 +53,7 @@ exports.admin_products_view = async(req,res,next) =>{
         });
     }
     catch(error){
-        return res.status(500).json({ message: "Server error" });
+        return res.status(500).json({message: error.message || "Internal Server Error"});
     }
 }
 
@@ -85,11 +83,11 @@ exports.admin_product_update = async (req, res, next) => {
       WHERE product_id = ${product_id}
     `;
 
-    return res.json({ message: "success" });
+    return res.status(200).json({message:"SUCCESS"});
   } 
   catch (error) {
     console.error("Admin product update error:", error);
-    return res.status(500).json({ message: "Server error" });
+    return res.status(500).json({message: error.message || "Internal Server Error"});
   };
 };
 
@@ -129,20 +127,20 @@ exports.admin_product_delete = async(req,res,next) =>{
     }
     catch(error){
         await sql`ROLLBACK`;
-        return res.status(500).json({ message:"Server error" });
+        return res.status(500).json({message: error.message || "Internal Server Error"});
     };
 };
 
 exports.admin_user_update = async(req,res,next) =>{
     try{
         const {email} = req.params;
-        const {name,phone_number,product_tracking,role,active_alerts,billing,signup_date} = req.body;
+        const {name,phone_number,products_tracking,role,active_alerts,billing,signup_date} = req.body;
         await sql`
             UPDATE signup
             SET 
                 name = ${name},
                 phone_number = ${phone_number},
-                product_tracking = ${product_tracking},
+                products_tracking = ${products_tracking},
                 role = ${role},
                 active_alerts = ${active_alerts},
                 billing = ${billing},
@@ -150,9 +148,8 @@ exports.admin_user_update = async(req,res,next) =>{
             WHERE email = ${email}
         `;
         return res.status(200).json({message:"SUCCESS"});
-
     }
     catch(error){
-        return res.status(500).json({ message:"Server error" });
+        return res.status(500).json({message: error.message || "Internal Server Error"});
     }
 }

@@ -8,6 +8,9 @@ exports.postlogin = async(req,res,next) => {
     console.log("postlogin")
     const {email, password} = req.body;
     try {
+        if (!email || !password) {
+            return res.status(400).json({ message: "Email and password are required" });
+        }
         // check weather a email is valid or not
         const user_data = await sql`
             SELECT * FROM signup WHERE email = ${email}
