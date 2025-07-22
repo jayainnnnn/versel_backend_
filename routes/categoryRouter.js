@@ -1,6 +1,5 @@
 const express = require('express');
 const categoryRouter = express.Router();
-const {requireLogin} = require('../models/auth');
 
 const categoryController = require('../controllers/categoryController');
 

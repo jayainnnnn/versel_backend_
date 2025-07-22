@@ -5,6 +5,7 @@ const homeRouter = require('./routes/homeRouter.js');
 const productRouter = require('./routes/productRouter.js');
 const categoryRouter = require('./routes/categoryRouter.js')
 const adminRouter = require('./routes/adminRouter.js')
+const chatRouter = require('/routes/chatRouter.js')
 const {page_limiter,add_product_limiter} = require('./models/ratelimit.js')
 const {requireLogin,requireAdmin} = require('./models/auth.js')
 const http = require("http");
@@ -30,7 +31,7 @@ app.use("/",page_limiter,homeRouter);
 app.use("/category",requireLogin,page_limiter,categoryRouter);
 app.use("/producthome",requireLogin,add_product_limiter,productRouter);
 app.use("/admin",requireLogin,page_limiter,adminRouter)
-
+app.use("/chat",chatRouter)
 
 const PORT = 3008;
 

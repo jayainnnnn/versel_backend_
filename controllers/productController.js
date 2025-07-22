@@ -116,7 +116,8 @@ exports.postadd_product = async(req,res,next) =>{
         return res.json({ status: "success", message: "PRODUCT ADDED SUCCESSFULLY" });
     }
     catch(error){
-        // if any error is raised
+        await sql`ROLLBACK`;
+        console.log(error.message)
         return res.status(500).json({message:error.message || "Internal Server Error"});
     }
 };
@@ -136,6 +137,8 @@ exports.search = async(req,res,next) => {
         return res.json(response.data)
     }
     catch(error){
+        await sql`ROLLBACK`;
+        console.log(error.message)
         return res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 }
@@ -143,14 +146,12 @@ exports.search = async(req,res,next) => {
 exports.add_searched_product = async(req,res,next) => {
     try{
         const {product_id} = req.params;
+        const { name,price,image} = req.body
+        const url = `https://www.amazon.in/dp/${product_id}`;
         const email = req.session.user.email;
-        console.log("step 1 api called with valid id")
-        // check wheather he can add the product or not
         if (req.session.user.role==='free_user' && req.session.user.product_tracking>100){
-            return res.json({message:'limit exceed for free user'});
+            return res.status(200).json({message:'limit exceed for free user'});
         }
-        
-        console.log("step 2 allowed user")
         const check_already_searching_by_user = await sql`
             SELECT * 
             FROM user_urls
@@ -159,7 +160,6 @@ exports.add_searched_product = async(req,res,next) => {
         if(check_already_searching_by_user.length>0){
             return res.json({message:"PRODUCT ALREADY SEARCHING"})
         }
-        console.log("step 3 check_already_searching_by_user allowed")
         const check_already_searching_by_us = await sql`
             SELECT * 
             FROM products_data
@@ -167,62 +167,52 @@ exports.add_searched_product = async(req,res,next) => {
             `;
         if(check_already_searching_by_us.length>0){
             await sql`BEGIN`;
-            const products_count = await sql`
-                UPDATE signup 
-                SET products_tracking = products_tracking+1
-                WHERE email = ${email}
-                RETURNING products_tracking
-            `;
-            await sql`
+                const products_count = await sql`
+                    UPDATE signup 
+                    SET products_tracking = products_tracking+1
+                    WHERE email = ${email}
+                    RETURNING products_tracking
+                `;
+                await sql`
                     INSERT INTO user_urls (email, product_id)
                     VALUES (${email}, ${product_id})
                 `;
-            req.session.user.products_tracking = products_count;
+                req.session.user.products_tracking = products_count;
             await sql`COMMIT`;
-            return res.json({message:"PRODUCT ADDED SUCCESSFULLY"})
+            return res.status(200).json({message:"PRODUCT ADDED SUCCESSFULLY"})
         }
-        console.log("step 4 check_already_searching_by_us allowed")
-        // else start a seprate tracking for him
-        const product_url = `https://www.amazon.in/dp/${product_id}`;
-        const response = await axios.post(`${api_path}/addproduct`,{
-                product_id: product_id,
-                product_url: product_url
-            },{
-                headers: { "Content-Type": "application/json" }
-            });
-        
-        console.log("step 5 api called success")
-        console.log(response.status)
-        if(response.status===200){
-            console.log("if called")
+        if(name && product_id && image && price && url){
             await sql`BEGIN`;
-            const products_count = await sql`
-                UPDATE signup 
-                SET products_tracking = products_tracking+1
-                WHERE email = ${email}
-                RETURNING products_tracking
-            `;
-            await sql`
+                const products_count = await sql`
+                    UPDATE signup 
+                    SET products_tracking = products_tracking+1
+                    WHERE email = ${email}
+                    RETURNING products_tracking
+                `;
+                await sql`
                     INSERT INTO user_urls (email, product_id)
                     VALUES (${email}, ${product_id})    
-            `;
-            console.log("step 5.1: user_urls insert");
-
-            await sql`
+                `;
+                const data = await sql`
+                    INSERT INTO products_data (product_id,product_url,product_name,
+                                            product_image,product_price,product_max_price,
+                                            product_discount,date,users_tracked)
+                    VALUES (${product_id},${url},${name},
+                            ${image},${price},${price},
+                            0,CURRENT_DATE,0)
+                    RETURNING *
+                `;
+                await sql`
                     INSERT INTO product_ids (product_id)
                     VALUES (${product_id})
-            `;
+                `;
             await sql`COMMIT`;
-            console.log(products_count)
-            console.log("step 5.2: product_ids insert");
-            }
-            else{
-                return res.json({ status: "Failed", message: "PRODUCT FAILED TO ADD" });
-            }
+        }
         return res.json({ status: "success", message: "PRODUCT ADDED SUCCESSFULLY" });
     }
     catch(error){
-        // if any error is raised
+        await sql`ROLLBACK`;
+        console.log(error.message)
         return res.status(500).json({message:error.message || "Internal Server Error"});
     }
 };
@@ -254,10 +244,8 @@ exports.product_remove = async (req, res, next) => {
             status: "success"
         });
     } catch (error) {
-        console.error("ERROR in product_remove:", error);
+        console.error(error.message);
         await sql`ROLLBACK`; 
-        return res.status(500).json({
-            message: error.message || "Internal Server Error"
-        });
+        return res.status(500).json({message: error.message || "Internal Server Error"});
     }
 };

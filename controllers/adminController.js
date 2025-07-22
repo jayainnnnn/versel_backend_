@@ -2,6 +2,7 @@ const { sql } = require('../models/db');
 
 exports.admin_dashboard = async(req,res,next) => {
     try{
+        console.log("api called admin_dashboard")
         const userdetails = await sql`
             SELECT 
                 COUNT(*) AS total_users,
@@ -9,6 +10,7 @@ exports.admin_dashboard = async(req,res,next) => {
                 SUM(active_alerts) AS active_alerts
             FROM signup
         `;
+        console.log("step1")
         const productdetails = await sql`
             select 
                 COUNT(CASE WHEN product_discount>0 THEN 1 END) AS positive_discount,
@@ -16,6 +18,7 @@ exports.admin_dashboard = async(req,res,next) => {
                 COUNT(*) AS total_products
             from products_data
         `;
+        console.log("step2")
         const topTracked = await sql`
             SELECT 
                 product_name,
@@ -26,16 +29,18 @@ exports.admin_dashboard = async(req,res,next) => {
             ORDER BY users_tracked DESC
             LIMIT 5
         `;
-        const today_change = await sql`
-            SELECT 
-                SUM(total_free_users+total_premium_users) as total_users,
-                total_premium_users AS total_premium_users,
-                total_alerts,
-                positive,
-                negative
-            FROM daily_change
-            WHERE date = '2025-07-21'
-        `;
+        console.log("step3")
+        // const today_change = await sql`
+        //     SELECT 
+        //         SUM(total_free_users+total_premium_users) as total_users,
+        //         total_premium_users AS total_premium_users,
+        //         total_alerts,
+        //         positive,
+        //         negative
+        //     FROM daily_change
+        //     WHERE date = '2025-07-21'
+        // `;
+        console.log("step4")
         const weekly_change = await sql`
             SELECT
                 positive,negative
@@ -43,13 +48,14 @@ exports.admin_dashboard = async(req,res,next) => {
             ORDER BY date DESC
             LIMIT 7
         `;
+        console.log("step5")
 
         
         return res.status(200).json({
             userdetails: userdetails[0],
             productdetails: productdetails[0],
             topTracked: topTracked,
-            today_change: today_change[0],
+            // today_change: today_change[0],
             weekly_change: weekly_change[0]
         });
     }
@@ -71,6 +77,7 @@ exports.admin_all_users_details = async(req,res,next) => {
 }
 
 exports.admin_products_view = async(req,res,next) =>{
+    console.log("product_view api called")
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
@@ -81,11 +88,13 @@ exports.admin_products_view = async(req,res,next) =>{
         LIMIT ${limit}
         OFFSET ${offset}
         `;
+        console.log(response)
         return res.status(200).json({
             products: response
         });
     }
     catch(error){
+        console.log(error.message)
         return res.status(500).json({message: error.message || "Internal Server Error"});
     }
 }
@@ -166,6 +175,7 @@ exports.admin_product_delete = async(req,res,next) =>{
 
 exports.admin_user_update = async(req,res,next) =>{
     try{
+        console.log("api admin user update")
         const {email} = req.params;
         const {name,phone_number,products_tracking,role,active_alerts,billing,signup_date} = req.body;
         await sql`
@@ -183,6 +193,7 @@ exports.admin_user_update = async(req,res,next) =>{
         return res.status(200).json({message:"SUCCESS"});
     }
     catch(error){
+        console.log(error.message)
         return res.status(500).json({message: error.message || "Internal Server Error"});
     }
 }
