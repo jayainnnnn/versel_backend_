@@ -11,7 +11,7 @@ const http = require("http");
 const app = express();
 require("dotenv").config();
 console.log("AJTracker backend starting...");
-
+app.set('trust proxy', true);
 process.on("uncaughtException", (err) => {
   console.error("Uncaught Exception:", err);
 });
