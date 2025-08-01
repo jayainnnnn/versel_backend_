@@ -1,1 +1,1 @@
-exports.api_path = 'http://127.0.0.1:8000'
+exports.api_path = process.env.fastapi_url

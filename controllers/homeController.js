@@ -1,6 +1,6 @@
 const {sql} = require("../models/db");
 const bcrypt = require('bcrypt');
-const { getIO } = require("../sockets/socket");
+// const { getIO } = require("../sockets/socket");
 
 
 exports.postlogin = async(req,res,next) => {
@@ -78,8 +78,8 @@ exports.postsignup = async(req,res,next) => {
             `;
 
 
-            const io = getIO();
-            io.emit("userCounts", result[0]);
+            // const io = getIO();
+            // io.emit("userCounts", result[0]);
 
             return res.json({ message: "SUCCESS" });
         }
