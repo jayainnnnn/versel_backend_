@@ -11,7 +11,7 @@ const http = require("http");
 const app = express();
 require("dotenv").config();
 console.log("AJTracker backend starting...");
-app.set('trust proxy', 1);
+// app.set('trust proxy', 1);
 process.on("uncaughtException", (err) => {
   console.error("Uncaught Exception:", err);
 });
@@ -39,7 +39,7 @@ app.get("/", (req, res) => {
 
 app.use("/",page_limiter,homeRouter);
 app.use("/category",page_limiter,categoryRouter);
-app.use("/producthome",requireLogin,add_product_limiter,productRouter);
+app.use("/producthome",add_product_limiter,productRouter);
 app.use("/admin",requireAdmin,page_limiter,adminRouter)
 
 const PORT = process.env.PORT || 3008;
